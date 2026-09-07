@@ -65,6 +65,14 @@ namespace UnityStandardAssets._2D
             // Set whether or not the character is crouching in the animator
             m_Anim.SetBool("Crouch", crouch);
 
+            if (m_Grounded && jump && crouch)
+            {
+                m_Grounded = false;
+                m_Anim.SetBool("Ground", false);
+                float newJumpForceY = m_JumpForce * 1.5f;
+                m_Rigidbody2D.AddForce(new Vector2(0.0f, newJumpForceY));
+            }
+
             //only control the player if grounded or airControl is turned on
             if (m_Grounded || m_AirControl)
             {
