@@ -11,7 +11,13 @@ namespace UnityStandardAssets._2D
         [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;  // Amount of maxSpeed applied to crouching movement. 1 = 100%
         [SerializeField] private bool m_AirControl = false;                 // Whether or not a player can steer while jumping;
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
+    
+        [SerializeField] private int m_MaxAirJumps = 2;                     // The number of multiples jumps allowed
 
+        [SerializeField] private float m_AirJumpForce = 400f;               // Amount of force added when the player jumps from the Air
+        [SerializeField] private bool m_ResetVerticalVelocityOnAirJump = true; // Resetting the force of an Air jump
+
+        private int m_AirJumpsRemaining;    // An Air Jump Counter
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
         const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
         private bool m_Grounded;            // Whether or not the player is grounded.
@@ -33,6 +39,7 @@ namespace UnityStandardAssets._2D
 
         private void FixedUpdate()
         {
+            bool wasGround = m_Grounded;
             m_Grounded = false;
 
             // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
@@ -43,6 +50,14 @@ namespace UnityStandardAssets._2D
                 if (colliders[i].gameObject != gameObject)
                     m_Grounded = true;
             }
+
+            //Actual Landing
+            if (m_Grounded && !wasGround && m_Rigidbody2D.linearVelocity.y <= 0.01f)
+            {
+                //Debug.Log("Landed?");
+                m_AirJumpsRemaining = m_MaxAirJumps;
+            }
+
             m_Anim.SetBool("Ground", m_Grounded);
 
             // Set the vertical animation
@@ -53,7 +68,8 @@ namespace UnityStandardAssets._2D
         public void Move(float move, bool crouch, bool jump)
         {
             // If crouching, check to see if the character can stand up
-            if (!crouch && m_Anim.GetBool("Crouch"))
+            if (!crouch && m_Anim.GetBool("Crouch")) 
+ 
             {
                 // If the character has a ceiling preventing them from standing up, keep them crouching
                 if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
@@ -105,7 +121,26 @@ namespace UnityStandardAssets._2D
                 m_Grounded = false;
                 m_Anim.SetBool("Ground", false);
                 m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+                m_AirJumpsRemaining = m_MaxAirJumps;
+                Debug.Log($"Should Jump, air jumps left? {m_AirJumpsRemaining}");
             }
+            // If player should multiple jumps...
+            else if (m_AirJumpsRemaining > 0 && jump && !m_Grounded)
+            {
+                Debug.Log("Jumping In the Air?");
+                Debug.Log($"air jumps left: {m_AirJumpsRemaining}");
+                // Every Air jumps get weaker and weaker
+                //  if (m_ResetVerticalVelocityOnAirJump)
+                // {
+                //     m_Rigidbody2D.linearVelocity = new Vector2(m_Rigidbody2D.linearVelocity.x, 0f);
+
+                // }
+
+                m_Rigidbody2D.AddForce(new Vector2(0, m_AirJumpForce));
+                m_AirJumpsRemaining--;
+            }
+
+            
         }
 
 
