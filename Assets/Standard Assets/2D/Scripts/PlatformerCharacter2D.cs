@@ -64,7 +64,14 @@ namespace UnityStandardAssets._2D
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.linearVelocity.y);
         }
 
-
+        // Boolean function if PlayerCharacter2D is truly grounded
+        public bool Grounded
+        {
+            get {
+                return m_Grounded;
+            }
+            
+        }
         public void Move(float move, bool crouch, bool jump)
         {
             // If crouching, check to see if the character can stand up
