@@ -15,13 +15,18 @@ namespace UnityStandardAssets._2D
         private Vector3 m_LastTargetPosition;
         private Vector3 m_CurrentVelocity;
         private Vector3 m_LookAheadPos;
+        private PlatformerCharacter2D m_TargetCharacter;
+
+        [SerializeField] private float m_MaxAirborneYDeviation = 3f;
 
         // Use this for initialization
         private void Start()
         {
+
             m_LastTargetPosition = target.position;
             m_OffsetZ = (transform.position - target.position).z;
             transform.parent = null;
+            m_TargetCharacter = target.GetComponent<PlatformerCharacter2D>();
         }
 
 
@@ -42,7 +47,14 @@ namespace UnityStandardAssets._2D
                 m_LookAheadPos = Vector3.MoveTowards(m_LookAheadPos, Vector3.zero, Time.deltaTime*lookAheadReturnSpeed);
             }
 
-            Vector3 aheadTargetPos = target.position + m_LookAheadPos + Vector3.forward*m_OffsetZ;
+            bool grounded = m_TargetCharacter != null && m_TargetCharacter.Grounded;
+            bool tooFarVertically = Math.Abs((target.position - m_LastTargetPosition).y) > m_MaxAirborneYDeviation;
+            float targetY = (grounded || tooFarVertically) ? target.position.y + m_LookAheadPos.y : transform.position.y;
+            float targetX = (target.position + m_LookAheadPos).x;
+
+
+             Vector3 aheadTargetPos = new Vector3(targetX, targetY, target.position.z) + Vector3.forward * m_OffsetZ;
+
             Vector3 newPos = Vector3.SmoothDamp(transform.position, aheadTargetPos, ref m_CurrentVelocity, damping);
 
             transform.position = newPos;

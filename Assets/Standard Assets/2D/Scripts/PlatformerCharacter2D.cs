@@ -129,20 +129,18 @@ namespace UnityStandardAssets._2D
                 m_Anim.SetBool("Ground", false);
                 m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
                 m_AirJumpsRemaining = m_MaxAirJumps;
-                Debug.Log($"Should Jump, air jumps left? {m_AirJumpsRemaining}");
             }
             // If player should multiple jumps...
             else if (m_AirJumpsRemaining > 0 && jump && !m_Grounded)
             {
-                Debug.Log("Jumping In the Air?");
-                Debug.Log($"air jumps left: {m_AirJumpsRemaining}");
+                // Debug.Log($"air jumps left: {m_AirJumpsRemaining}");
                 // Every Air jumps get weaker and weaker
                 //  if (m_ResetVerticalVelocityOnAirJump)
                 // {
                 //     m_Rigidbody2D.linearVelocity = new Vector2(m_Rigidbody2D.linearVelocity.x, 0f);
 
                 // }
-
+                Debug.Log("is jumping?");
                 m_Rigidbody2D.AddForce(new Vector2(0, m_AirJumpForce));
                 m_AirJumpsRemaining--;
             }
