@@ -133,15 +133,9 @@ namespace UnityStandardAssets._2D
             // If player should multiple jumps...
             else if (m_AirJumpsRemaining > 0 && jump && !m_Grounded)
             {
-                // Debug.Log($"air jumps left: {m_AirJumpsRemaining}");
-                // Every Air jumps get weaker and weaker
-                //  if (m_ResetVerticalVelocityOnAirJump)
-                // {
-                //     m_Rigidbody2D.linearVelocity = new Vector2(m_Rigidbody2D.linearVelocity.x, 0f);
-
-                // }
-                Debug.Log("is jumping?");
-                m_Rigidbody2D.AddForce(new Vector2(0, m_AirJumpForce));
+               // During the precendent falling or jumping, we cancel to give the proper momentum for the multiple jumps
+                m_Rigidbody2D.linearVelocity = new Vector2(m_Rigidbody2D.linearVelocity.x, 0f);
+                m_Rigidbody2D.AddForce(new Vector2(0f, m_AirJumpForce));
                 m_AirJumpsRemaining--;
             }
 
